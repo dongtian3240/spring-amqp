@@ -17,6 +17,14 @@
 		http://www.springframework.org/schema/rabbit
 		http://www.springframework.org/schema/rabbit/spring-rabbit-1.4.xsd">
 	 
+	 <!-- 创建 一个rabbit  CachingConnectionFactory 
+	 	
+	 	username: rabbitMQ 服务器端的登录用户名
+	 	password: rabbitMQ 服务器端的登录密码
+	 	port: rabbitMQ 服务器端的端口
+	 	host: rabbitMQ 服务器端的地址
+	 	virtual-host: rabbitMQ 虚拟主机
+	  -->
 	<rabbit:connection-factory 
 			id="connectionFactory" 
 			username="admin" 
@@ -25,19 +33,26 @@
  			virtual-host="/spring" 
  			host="localhost"/>
 
-<rabbit:template connection-factory="connectionFactory" id="amqTemplate" exchange="myExchange" routing-key="foo.bar"></rabbit:template>
+<!-- @org.springframework.amqp.rabbit.core.RabbitTemplate 
+	创建一个 rabbit模板 用于操作
+ -->
 
+<rabbit:template connection-factory="connectionFactory" id="amqTemplate" exchange="myExchange" routing-key="foo.bar"></rabbit:template>
+<!--  创建一个 rabbitmq 管理  用于管理  交换机  队列  和 bindings -->
 <rabbit:admin connection-factory="connectionFactory" />
 
-
+<!-- 创建一个直接匹配的交换机  -->
 <rabbit:direct-exchange name="myExchange" >
+<!-- 将队列绑定到交换机 -->
     <rabbit:bindings>
         <rabbit:binding queue="myQueue"  key="foo.bar" />
     </rabbit:bindings>
 </rabbit:direct-exchange>
 
+<!-- 创建一个队列 -->
 <rabbit:queue name="myQueue" auto-delete="false" durable="false" />
 
+<!--  创建一个监听器 -->
 <rabbit:listener-container connection-factory="connectionFactory">
     <rabbit:listener ref="foo" method="listen" queue-names="myQueue" />
 </rabbit:listener-container>
