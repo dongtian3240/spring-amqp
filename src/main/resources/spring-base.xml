@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/rabbit
+		http://www.springframework.org/schema/rabbit/spring-rabbit-1.4.xsd">
+	 
+	<rabbit:connection-factory 
+			id="connectionFactory" 
+			username="admin" 
+			password="admin" 
+			port="5672"
+ 			virtual-host="/spring" 
+ 			host="localhost"/>
+
+<rabbit:template connection-factory="connectionFactory" id="amqTemplate" exchange="myExchange" routing-key="foo.bar"></rabbit:template>
+
+<rabbit:admin connection-factory="connectionFactory" />
+
+
+<rabbit:direct-exchange name="myExchange" >
+    <rabbit:bindings>
+        <rabbit:binding queue="myQueue"  key="foo.bar" />
+    </rabbit:bindings>
+</rabbit:direct-exchange>
+
+<rabbit:queue name="myQueue" auto-delete="false" durable="false" />
+
+<rabbit:listener-container connection-factory="connectionFactory">
+    <rabbit:listener ref="foo" method="listen" queue-names="myQueue" />
+</rabbit:listener-container>
+
+<bean id="foo" class="mq.foo.Foo" />
+
+</beans>
