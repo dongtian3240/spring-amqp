@@ -56,7 +56,7 @@
 <rabbit:listener-container connection-factory="connectionFactory">
     <rabbit:listener ref="foo" method="listen" queue-names="myQueue" />
 </rabbit:listener-container>
-
+<!--  -->
 <bean id="foo" class="mq.foo.Foo" />
 
 </beans>
